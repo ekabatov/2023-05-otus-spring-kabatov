@@ -1,0 +1,5 @@
+Which is a reserved word in the Java programming language?,method,native,subclasses,reference
+Which is a valid keyword in java?,interface,string,Float,unsigned
+Which class does not override the equals() and hashCode() methods inheriting them directly from class Object?,java.lang.String,java.lang.Double,java.lang.StringBuffer,java.lang.Character
+Which collection class allows you to grow or shrink its size and provides indexed access to its elements but whose methods are not synchronized?,java.util.HashSet,java.util.LinkedHashSet,java.util.List,java.util.ArrayList
+Which interface does java.util.Hashtable implement?,Java.util.Map,Java.util.List,Java.util.HashTable,Java.util.Collection
