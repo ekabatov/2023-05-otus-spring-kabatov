@@ -20,7 +20,7 @@ public class CsvTestUploaderImpl implements ITestUploader {
     @Override
     public Test uploadTest() {
         List<Question> questions = new ArrayList<>();
-        try (Scanner scanner = new Scanner(ResourceUtils.getFile("classpath:questions.csv"))) {
+        try (Scanner scanner = new Scanner(ResourceUtils.getFile(url))) {
             while (scanner.hasNextLine()) {
                 questions.add(parseLine(scanner.nextLine()));
             }
