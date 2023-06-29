@@ -5,9 +5,11 @@ spring:
 
 application:
   message: "Test Props msg"
-  locale: ru_RU
+  locale: en
+
 
 command:
   line:
     runner:
-      enabled: true
+      enabled: false
+

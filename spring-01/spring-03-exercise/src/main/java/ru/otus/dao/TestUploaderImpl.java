@@ -19,7 +19,7 @@ public class TestUploaderImpl implements TestUploader {
     private AppProps props;
 
     @Override
-    public Test uploadTest() {
+    public Test loadTest() {
         Test test = new Test();
         test.setQuestions(new ArrayList<>());
         for (int i = 0; i < 5; i++) {
