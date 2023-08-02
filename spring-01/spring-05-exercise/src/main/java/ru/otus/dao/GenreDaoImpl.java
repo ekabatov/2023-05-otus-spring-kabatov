@@ -23,7 +23,7 @@ public class GenreDaoImpl implements GenreDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", id);
         return Optional.ofNullable(jdbcTemplate.queryForObject(
-                "SELECT * FROM GENRE WHERE ID = :id", namedParameters, new GenreMapper()));
+                "SELECT ID, NAME FROM GENRE WHERE ID = :id", namedParameters, new GenreMapper()));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class GenreDaoImpl implements GenreDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", book.getId());
         return jdbcTemplate.query(
-                "SELECT * FROM GENRE WHERE ID IN (SELECT GENRE_ID FROM BOOK_GENRE WHERE BOOK_ID = :id)",
+                "SELECT ID, NAME FROM GENRE WHERE ID IN (SELECT GENRE_ID FROM BOOK_GENRE WHERE BOOK_ID = :id)",
                 namedParameters,
                 new GenreMapper());
 
@@ -41,6 +41,6 @@ public class GenreDaoImpl implements GenreDao {
     public List<Genre> findAll() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
         return jdbcTemplate.query(
-                "SELECT * FROM GENRE", namedParameters, new GenreMapper());
+                "SELECT ID, NAME FROM GENRE", namedParameters, new GenreMapper());
     }
 }

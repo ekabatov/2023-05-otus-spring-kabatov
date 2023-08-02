@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.otus.domain.Author;
 import ru.otus.domain.Book;
 import ru.otus.domain.Genre;
-import ru.otus.exception.AuthorNotFoundException;
-import ru.otus.exception.GenreNotFoundException;
+import ru.otus.exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class LibraryFacadeImpl implements LibraryFacade {
+
     private final IOService ioService;
 
     private final AuthorService authorService;
@@ -42,46 +42,6 @@ public class LibraryFacadeImpl implements LibraryFacade {
         updateBook.setAuthors(book.getAuthors());
         updateBook.setGenres(book.getGenres());
         bookService.update(updateBook);
-    }
-
-    private Book createBookByUser() {
-        Book book = userInteraction.createBook();
-        book.setGenres(getGenresForBook());
-        book.setAuthors(getAuthorsForBook());
-
-        return book;
-    }
-
-    private List<Genre> getGenresForBook() {
-        List<Genre> genres = new ArrayList<>();
-        printGenres();
-        ioService.printString("Choice genre. For exit enter -1!");
-        Long id;
-        while ((id = userInteraction.getId()) != -1) {
-            Optional<Genre> genre = genreService.findById(id);
-            Long finalId = id;
-            genre.ifPresentOrElse(genres::add, () -> {
-                throw new GenreNotFoundException("Genre id = " + finalId + " not found");
-            });
-        }
-        return genres;
-    }
-
-    private List<Author> getAuthorsForBook() {
-        List<Author> authors = new ArrayList<>();
-
-        printAuthors();
-
-        ioService.printString("Choice author. For exit enter -1!");
-        Long id;
-        while ((id = userInteraction.getId()) != -1) {
-            Optional<Author> author = authorService.findById(id);
-            Long finalId = id;
-            author.ifPresentOrElse(authors::add, () -> {
-                throw new AuthorNotFoundException("Author id = " + finalId + " not found");
-            });
-        }
-        return authors;
     }
 
     @Override
@@ -128,5 +88,45 @@ public class LibraryFacadeImpl implements LibraryFacade {
     public void deleteBook() {
         Long id = userInteraction.getId();
         bookService.deleteById(id);
+    }
+
+    private Book createBookByUser() {
+        Book book = userInteraction.createBook();
+        book.setGenres(getGenresForBook());
+        book.setAuthors(getAuthorsForBook());
+
+        return book;
+    }
+
+    private List<Genre> getGenresForBook() {
+        List<Genre> genres = new ArrayList<>();
+        printGenres();
+        ioService.printString("Choice genre. For exit enter -1!");
+        Long id;
+        while ((id = userInteraction.getId()) != -1) {
+            Optional<Genre> genre = genreService.findById(id);
+            Long finalId = id;
+            genre.ifPresentOrElse(genres::add, () -> {
+                throw new EntityNotFoundException("Genre id = " + finalId + " not found");
+            });
+        }
+        return genres;
+    }
+
+    private List<Author> getAuthorsForBook() {
+        List<Author> authors = new ArrayList<>();
+
+        printAuthors();
+
+        ioService.printString("Choice author. For exit enter -1!");
+        Long id;
+        while ((id = userInteraction.getId()) != -1) {
+            Optional<Author> author = authorService.findById(id);
+            Long finalId = id;
+            author.ifPresentOrElse(authors::add, () -> {
+                throw new EntityNotFoundException("Author id = " + finalId + " not found");
+            });
+        }
+        return authors;
     }
 }

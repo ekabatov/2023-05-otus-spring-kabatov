@@ -11,7 +11,7 @@ import ru.otus.dao.mapper.BookMapper;
 import ru.otus.domain.Author;
 import ru.otus.domain.Book;
 import ru.otus.domain.Genre;
-import ru.otus.exception.BookNotFoundException;
+import ru.otus.exception.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,14 +59,14 @@ public class BookDaoImpl implements BookDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", id);
         Optional<Book> book = Optional.ofNullable(jdbcTemplate.queryForObject(
-                "SELECT * FROM BOOK WHERE id = :id", namedParameters, new BookMapper()));
+                "SELECT ID, NAME FROM BOOK WHERE id = :id", namedParameters, new BookMapper()));
         if (book.isPresent()) {
             List<Author> authorsByBook = authorDao.findAuthorsByBook(book.get());
             List<Genre> genresByBook = genreDao.findGenresByBook(book.get());
             book.get().setAuthors(authorsByBook);
             book.get().setGenres(genresByBook);
         } else {
-            throw new BookNotFoundException("Book with id = " + id + " is not found");
+            throw new EntityNotFoundException("Book with id = " + id + " is not found");
         }
         return book;
     }
@@ -75,7 +75,7 @@ public class BookDaoImpl implements BookDao {
     public List<Book> findAll() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
         return jdbcTemplate.query(
-                "SELECT * FROM BOOK", namedParameters, new BookMapper());
+                "SELECT ID, NAME FROM BOOK", namedParameters, new BookMapper());
     }
 
     @Override

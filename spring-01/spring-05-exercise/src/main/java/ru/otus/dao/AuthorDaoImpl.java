@@ -23,7 +23,7 @@ public class AuthorDaoImpl implements AuthorDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", id);
         return Optional.ofNullable(jdbcTemplate.queryForObject(
-                "SELECT * FROM AUTHOR WHERE ID = :id", namedParameters, new AuthorMapper()));
+                "SELECT ID, NAME FROM AUTHOR WHERE ID = :id", namedParameters, new AuthorMapper()));
 
     }
 
@@ -32,7 +32,7 @@ public class AuthorDaoImpl implements AuthorDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", book.getId());
         return jdbcTemplate.query(
-                "SELECT * FROM AUTHOR WHERE ID IN (SELECT AUTHOR_ID FROM BOOK_AUTHOR WHERE BOOK_ID = :id)",
+                "SELECT ID, NAME FROM AUTHOR WHERE ID IN (SELECT AUTHOR_ID FROM BOOK_AUTHOR WHERE BOOK_ID = :id)",
                 namedParameters,
                 new AuthorMapper());
     }
@@ -41,7 +41,7 @@ public class AuthorDaoImpl implements AuthorDao {
     public List<Author> findAll() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
         return jdbcTemplate.query(
-                "SELECT * FROM AUTHOR", namedParameters, new AuthorMapper());
+                "SELECT ID, NAME FROM AUTHOR", namedParameters, new AuthorMapper());
 
     }
 }
