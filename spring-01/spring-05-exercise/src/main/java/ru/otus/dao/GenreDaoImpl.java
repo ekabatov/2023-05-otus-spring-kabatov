@@ -31,7 +31,7 @@ public class GenreDaoImpl implements GenreDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", book.getId());
         return jdbcTemplate.query(
-                "SELECT ID, NAME FROM GENRE WHERE ID IN (SELECT GENRE_ID FROM BOOK_GENRE WHERE BOOK_ID = :id)",
+                "SELECT ID, NAME FROM GENRE G JOIN BOOK_GENRE BG ON G.ID=BG.GENRE_ID WHERE BG.BOOK_ID=:id",
                 namedParameters,
                 new GenreMapper());
 

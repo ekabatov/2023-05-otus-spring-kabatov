@@ -32,7 +32,7 @@ public class AuthorDaoImpl implements AuthorDao {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", book.getId());
         return jdbcTemplate.query(
-                "SELECT ID, NAME FROM AUTHOR WHERE ID IN (SELECT AUTHOR_ID FROM BOOK_AUTHOR WHERE BOOK_ID = :id)",
+                "SELECT ID, NAME FROM AUTHOR A JOIN BOOK_AUTHOR BA ON A.ID=BA.AUTHOR_ID WHERE BA.BOOK_ID=:id",
                 namedParameters,
                 new AuthorMapper());
     }

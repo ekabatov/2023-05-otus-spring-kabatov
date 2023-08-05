@@ -1,15 +1,11 @@
 package ru.otus.domain;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.List;
 import java.util.Objects;
 
 @Data
-@ToString
-@EqualsAndHashCode
 public class Book {
     private Long id;
 
@@ -31,5 +27,15 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", authors=" + authors +
+                ", genres=" + genres +
+                '}';
     }
 }

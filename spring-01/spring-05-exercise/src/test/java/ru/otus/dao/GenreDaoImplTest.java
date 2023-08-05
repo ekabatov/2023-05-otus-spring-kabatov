@@ -48,7 +48,7 @@ class GenreDaoImplTest {
     @Test
     void shouldFindById_whenGiveId() {
 
-        given(jdbcTemplate.queryForObject(eq("SELECT * FROM GENRE WHERE ID = :id"), isA(SqlParameterSource.class), isA(GenreMapper.class)))
+        given(jdbcTemplate.queryForObject(eq("SELECT ID, NAME FROM GENRE WHERE ID = :id"), isA(SqlParameterSource.class), isA(GenreMapper.class)))
                 .willReturn(genre);
         assertThat(genreDao.findById(genre.getId()))
                 .isEqualTo(Optional.of(genre));
@@ -60,7 +60,7 @@ class GenreDaoImplTest {
         genres.add(genre);
 
         given(jdbcTemplate.query(
-                eq("SELECT * FROM GENRE WHERE ID IN (SELECT GENRE_ID FROM BOOK_GENRE WHERE BOOK_ID = :id)"),
+                eq("SELECT ID, NAME FROM GENRE G JOIN BOOK_GENRE BG ON G.ID=BG.GENRE_ID WHERE BG.BOOK_ID=:id"),
                 isA(SqlParameterSource.class),
                 isA(GenreMapper.class)))
                 .willReturn(genres);
@@ -74,7 +74,7 @@ class GenreDaoImplTest {
         genres.add(genre);
 
         given(jdbcTemplate.query(
-                eq("SELECT * FROM GENRE"),
+                eq("SELECT ID, NAME FROM GENRE"),
                 isA(SqlParameterSource.class),
                 isA(GenreMapper.class)))
                 .willReturn(genres);

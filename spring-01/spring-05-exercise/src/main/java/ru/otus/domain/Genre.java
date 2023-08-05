@@ -1,12 +1,10 @@
 package ru.otus.domain;
 
 import lombok.Data;
-import lombok.ToString;
 
 import java.util.Objects;
 
 @Data
-@ToString
 public class Genre {
     private Long id;
 
@@ -24,5 +22,13 @@ public class Genre {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Genre{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

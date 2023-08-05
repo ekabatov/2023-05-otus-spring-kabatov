@@ -48,7 +48,7 @@ class AuthorDaoImplTest {
     @Test
     void shouldFindById_whenGiveId() {
 
-        given(jdbcTemplate.queryForObject(eq("SELECT * FROM AUTHOR WHERE ID = :id"), isA(SqlParameterSource.class), isA(AuthorMapper.class)))
+        given(jdbcTemplate.queryForObject(eq("SELECT ID, NAME FROM AUTHOR WHERE ID = :id"), isA(SqlParameterSource.class), isA(AuthorMapper.class)))
                 .willReturn(author);
         assertThat(authorDao.findById(author.getId()))
                 .isEqualTo(Optional.of(author));
@@ -60,7 +60,7 @@ class AuthorDaoImplTest {
         authors.add(author);
 
         given(jdbcTemplate.query(
-                eq("SELECT * FROM AUTHOR WHERE ID IN (SELECT AUTHOR_ID FROM BOOK_AUTHOR WHERE BOOK_ID = :id)"),
+                eq("SELECT ID, NAME FROM AUTHOR A JOIN BOOK_AUTHOR BA ON A.ID=BA.AUTHOR_ID WHERE BA.BOOK_ID=:id"),
                 isA(SqlParameterSource.class),
                 isA(AuthorMapper.class)))
                 .willReturn(authors);
@@ -74,12 +74,11 @@ class AuthorDaoImplTest {
         authors.add(author);
 
         given(jdbcTemplate.query(
-                eq("SELECT * FROM AUTHOR"),
+                eq("SELECT ID, NAME FROM AUTHOR"),
                 isA(SqlParameterSource.class),
                 isA(AuthorMapper.class)))
                 .willReturn(authors);
         assertThat(authorDao.findAll())
                 .isEqualTo(authors);
     }
-
 }
