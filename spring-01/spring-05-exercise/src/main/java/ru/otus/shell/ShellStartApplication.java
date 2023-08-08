@@ -27,6 +27,11 @@ public class ShellStartApplication {
         libraryFacade.printBook();
     }
 
+    @ShellMethod(value = "Print book", key = {"print books"})
+    public void printBooks() {
+        libraryFacade.printBooks();
+    }
+
     @ShellMethod(value = "Edit book", key = {"edit book"})
     public void editBook() {
         libraryFacade.updateBook();

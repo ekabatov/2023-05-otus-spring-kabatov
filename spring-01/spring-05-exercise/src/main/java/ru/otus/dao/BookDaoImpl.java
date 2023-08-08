@@ -74,8 +74,15 @@ public class BookDaoImpl implements BookDao {
     @Override
     public List<Book> findAll() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
-        return jdbcTemplate.query(
+        List<Book> books = jdbcTemplate.query(
                 "SELECT ID, NAME FROM BOOK", namedParameters, new BookMapper());
+        books.forEach(book -> {
+            List<Author> authorsByBook = authorDao.findAuthorsByBook(book);
+            List<Genre> genresByBook = genreDao.findGenresByBook(book);
+            book.setAuthors(authorsByBook);
+            book.setGenres(genresByBook);
+        });
+        return books;
     }
 
     @Override
