@@ -11,6 +11,7 @@ import ru.otus.domain.Book;
 import ru.otus.domain.Genre;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -70,7 +71,7 @@ class BookDaoImplTest {
     void shouldDeleteById_whenGiveId() {
         Book bookFromDb = bookDao.save(book);
         bookDao.deleteById(bookFromDb.getId());
-        assertThrows(EmptyResultDataAccessException.class, () -> bookDao.findById(bookFromDb.getId()));
+        assertEquals(Optional.empty(), bookDao.findById(bookFromDb.getId()));
     }
 
     @Test

@@ -11,10 +11,16 @@ import ru.otus.dao.mapper.BookMapper;
 import ru.otus.domain.Author;
 import ru.otus.domain.Book;
 import ru.otus.domain.Genre;
-import ru.otus.exception.EntityNotFoundException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @AllArgsConstructor
@@ -58,31 +64,64 @@ public class BookDaoImpl implements BookDao {
     public Optional<Book> findById(long id) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("id", id);
-        Optional<Book> book = Optional.ofNullable(jdbcTemplate.queryForObject(
-                "SELECT ID, NAME FROM BOOK WHERE id = :id", namedParameters, new BookMapper()));
-        if (book.isPresent()) {
-            List<Author> authorsByBook = authorDao.findAuthorsByBook(book.get());
-            List<Genre> genresByBook = genreDao.findGenresByBook(book.get());
-            book.get().setAuthors(authorsByBook);
-            book.get().setGenres(genresByBook);
+        List<Book> books = jdbcTemplate.query(
+                """
+                        SELECT B.ID, B.NAME, A.ID, A.NAME, G.ID, G.NAME
+                        FROM BOOK B
+                        LEFT JOIN BOOK_AUTHOR BA ON B.ID=BA.BOOK_ID
+                        LEFT JOIN AUTHOR A ON A.ID=BA.AUTHOR_ID
+                        LEFT JOIN BOOK_GENRE BG ON B.ID=BG.BOOK_ID
+                        LEFT JOIN GENRE G ON G.ID=BG.GENRE_ID
+                        WHERE B.ID=:id
+                        """, namedParameters, new BookMapper());
+        books = mergeBooks(books);
+        if (books.isEmpty()) {
+            return Optional.empty();
         } else {
-            throw new EntityNotFoundException("Book with id = " + id + " is not found");
+            return Optional.ofNullable(books.get(0));
         }
-        return book;
     }
 
     @Override
     public List<Book> findAll() {
         SqlParameterSource namedParameters = new MapSqlParameterSource();
         List<Book> books = jdbcTemplate.query(
-                "SELECT ID, NAME FROM BOOK", namedParameters, new BookMapper());
-        books.forEach(book -> {
-            List<Author> authorsByBook = authorDao.findAuthorsByBook(book);
-            List<Genre> genresByBook = genreDao.findGenresByBook(book);
-            book.setAuthors(authorsByBook);
-            book.setGenres(genresByBook);
-        });
-        return books;
+                """
+                        SELECT B.ID, B.NAME, A.ID, A.NAME, G.ID, G.NAME
+                        FROM BOOK B
+                        LEFT JOIN BOOK_AUTHOR BA ON B.ID=BA.BOOK_ID
+                        LEFT JOIN AUTHOR A ON A.ID=BA.AUTHOR_ID
+                        LEFT JOIN BOOK_GENRE BG ON B.ID=BG.BOOK_ID
+                        LEFT JOIN GENRE G ON G.ID=BG.GENRE_ID
+                        """, namedParameters, new BookMapper());
+
+        return mergeBooks(books);
+    }
+
+    private List<Book> mergeBooks(List<Book> books) {
+        Map<Long, List<Book>> booksGroupingById = books.stream().
+                collect(groupingBy(Book::getId));
+        return booksGroupingById.entrySet().stream()
+                .map(entry -> {
+                    List<Book> booksById = entry.getValue();
+                    Set<Author> authors = booksById.stream()
+                            .map(Book::getAuthors)
+                            .filter(Objects::nonNull)
+                            .flatMap(List::stream)
+                            .collect(Collectors.toSet());
+                    Set<Genre> genres = booksById.stream()
+                            .map(Book::getGenres)
+                            .filter(Objects::nonNull)
+                            .flatMap(List::stream)
+                            .collect(Collectors.toSet());
+                    Book book = new Book();
+                    book.setId(entry.getKey());
+                    book.setName(booksById.get(0).getName());
+                    book.setAuthors(new ArrayList<>(authors));
+                    book.setGenres(new ArrayList<>(genres));
+                    return book;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
