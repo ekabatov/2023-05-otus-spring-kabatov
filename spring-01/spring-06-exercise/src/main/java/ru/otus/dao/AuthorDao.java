@@ -11,7 +11,4 @@ public interface AuthorDao {
     Optional<Author> findById(long id);
 
     List<Author> findAll();
-
-    List<Author> findAuthorsByBook(Book book);
-
 }

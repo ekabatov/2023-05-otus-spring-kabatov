@@ -11,6 +11,4 @@ public interface GenreDao {
     Optional<Genre> findById(long id);
 
     List<Genre> findAll();
-
-    List<Genre> findGenresByBook(Book book);
 }

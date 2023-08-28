@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lombok.AllArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 import ru.otus.domain.Author;
 import ru.otus.domain.Book;
@@ -20,20 +21,12 @@ public class AuthorDaoImpl implements AuthorDao {
 
     @Override
     public Optional<Author> findById(long id) {
-        return Optional.ofNullable(em.find(Author.class, id));
-    }
-
-    @Override
-    public List<Author> findAuthorsByBook(Book book) {
-
-//        em.createQuery("select ID, NAME from AUTHOR s left join fetch s.emails", OtusStudent.class);
-//        SqlParameterSource namedParameters = new MapSqlParameterSource()
-//                .addValue("id", book.getId());
-//        return jdbcTemplate.query(
-//                "SELECT ID, NAME FROM AUTHOR A JOIN BOOK_AUTHOR BA ON A.ID=BA.AUTHOR_ID WHERE BA.BOOK_ID=:id",
-//                namedParameters,
-//                new AuthorMapper());
-        return null;
+        return em.unwrap(Session.class)
+                .createQuery("SELECT a FROM Author a WHERE a.id=:id", Author.class)
+                .setParameter("id", id)
+                .setFirstResult(0)
+                .setMaxResults(1)
+                .uniqueResultOptional();
     }
 
     @Override

@@ -3,17 +3,11 @@ package ru.otus.shell;
 import lombok.AllArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import ru.otus.service.AuthorService;
-import ru.otus.service.GenreService;
 import ru.otus.service.LibraryFacade;
 
 @ShellComponent
 @AllArgsConstructor
 public class ShellStartApplication {
-
-    private AuthorService authorService;
-
-    private GenreService genreService;
 
     private LibraryFacade libraryFacade;
 
@@ -50,5 +44,25 @@ public class ShellStartApplication {
     @ShellMethod(value = "Print genres", key = {"genres", "g"})
     public void printGenres() {
         libraryFacade.printGenres();
+    }
+
+    @ShellMethod(value = "Create comment", key = {"create comment", "cc"})
+    public void createComment() {
+        libraryFacade.createComment();
+    }
+
+    @ShellMethod(value = "Print comments", key = {"print comments", "pc"})
+    public void printCommentsForBook() {
+        libraryFacade.printComments();
+    }
+
+    @ShellMethod(value = "Update comment", key = {"update comment", "uc"})
+    public void updateComment() {
+        libraryFacade.updateComment();
+    }
+
+    @ShellMethod(value = "Delete comment", key = {"delete comment", "dc"})
+    public void deleteComment() {
+        libraryFacade.deleteComment();
     }
 }

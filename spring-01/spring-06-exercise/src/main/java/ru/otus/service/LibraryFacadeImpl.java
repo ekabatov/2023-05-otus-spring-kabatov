@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.otus.domain.Author;
 import ru.otus.domain.Book;
+import ru.otus.domain.Comment;
 import ru.otus.domain.Genre;
 import ru.otus.exception.EntityNotFoundException;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +24,8 @@ public class LibraryFacadeImpl implements LibraryFacade {
     private final GenreService genreService;
 
     private final BookService bookService;
+
+    private final CommentService commentService;
 
     private final UserInteraction userInteraction;
 
@@ -90,16 +94,65 @@ public class LibraryFacadeImpl implements LibraryFacade {
         bookService.deleteById(id);
     }
 
+    @Override
+    public void createComment() {
+        ioService.printString("Enter book id");
+        Long id = userInteraction.getId();
+        Optional<Book> book = bookService.findById(id);
+        if (book.isPresent()) {
+            Comment comment = userInteraction.createComment();
+            comment.setBook(book.get());
+            commentService.save(comment);
+        } else {
+            throw new EntityNotFoundException("Book with id = " + id + " is not found");
+        }
+    }
+
+    @Override
+    public void printComments() {
+        ioService.printString("Show all comments for book");
+        ioService.printString("Enter book");
+        Long id = userInteraction.getId();
+        Optional<Book> book = bookService.findById(id);
+        if (book.isPresent()) {
+            List<Comment> comments = commentService.findByBook(book.get());
+            comments.forEach(System.out::println);
+        } else {
+            throw new EntityNotFoundException("Book with id = " + id + " is not found");
+        }
+    }
+
+    @Override
+    public void updateComment() {
+        ioService.printString("Enter comment id");
+        Long id = userInteraction.getId();
+        Optional<Comment> comment = commentService.findById(id);
+        if (comment.isPresent()) {
+            Comment updateComment = userInteraction.createComment();
+            updateComment.setId(comment.get().getId());
+            updateComment.setBook(comment.get().getBook());
+            commentService.update(updateComment);
+        } else {
+            throw new EntityNotFoundException("Comment with id = " + id + " is not found");
+        }
+    }
+
+    @Override
+    public void deleteComment() {
+        ioService.printString("Enter comment id");
+        Long id = userInteraction.getId();
+        commentService.deleteById(id);
+    }
+
     private Book createBookByUser() {
         Book book = userInteraction.createBook();
         book.setGenres(getGenresForBook());
         book.setAuthors(getAuthorsForBook());
-
         return book;
     }
 
-    private List<Genre> getGenresForBook() {
-        List<Genre> genres = new ArrayList<>();
+    private Set<Genre> getGenresForBook() {
+        Set<Genre> genres = new HashSet<>();
         printGenres();
         ioService.printString("Choice genre. For exit enter -1!");
         Long id;
@@ -113,8 +166,8 @@ public class LibraryFacadeImpl implements LibraryFacade {
         return genres;
     }
 
-    private List<Author> getAuthorsForBook() {
-        List<Author> authors = new ArrayList<>();
+    private Set<Author> getAuthorsForBook() {
+        Set<Author> authors = new HashSet<>();
 
         printAuthors();
 

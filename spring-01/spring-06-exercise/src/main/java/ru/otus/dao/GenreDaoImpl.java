@@ -4,7 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lombok.AllArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.stereotype.Component;
+import ru.otus.domain.Author;
 import ru.otus.domain.Book;
 import ru.otus.domain.Genre;
 
@@ -20,18 +22,12 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public Optional<Genre> findById(long id) {
-        return Optional.ofNullable(em.find(Genre.class, id));
-    }
-
-    @Override
-    public List<Genre> findGenresByBook(Book book) {
-//        SqlParameterSource namedParameters = new MapSqlParameterSource()
-//                .addValue("id", book.getId());
-//        return jdbcTemplate.query(
-//                "SELECT ID, NAME FROM GENRE G JOIN BOOK_GENRE BG ON G.ID=BG.GENRE_ID WHERE BG.BOOK_ID=:id",
-//                namedParameters,
-//                new GenreMapper());
-        return null;
+        return em.unwrap(Session.class)
+                .createQuery("SELECT g FROM Genre g WHERE g.id=:id", Genre.class)
+                .setParameter("id", id)
+                .setFirstResult(0)
+                .setMaxResults(1)
+                .uniqueResultOptional();
     }
 
     @Override

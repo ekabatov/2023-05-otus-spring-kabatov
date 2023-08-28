@@ -16,5 +16,11 @@ public interface LibraryFacade {
 
     void printGenres();
 
+    void createComment();
 
+    void printComments();
+
+    void updateComment();
+
+    void deleteComment();
 }

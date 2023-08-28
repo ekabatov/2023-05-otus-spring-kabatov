@@ -15,29 +15,29 @@ import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-public class BookDaoImpl implements BookDao {
+public class CommentDaoImpl implements CommentDao {
 
     @PersistenceContext
     private final EntityManager em;
 
     @Override
-    public Book save(Book book) {
-        return em.merge(book);
+    public Comment save(Comment comment) {
+        return em.merge(comment);
     }
 
     @Override
     public void deleteById(Long id) {
         Query query = em.createQuery("delete " +
-                "from Book b " +
-                "where b.id = :id");
+                "from Comment c " +
+                "where c.id = :id");
         query.setParameter("id", id);
         query.executeUpdate();
     }
 
     @Override
-    public Optional<Book> findById(long id) {
+    public Optional<Comment> findById(long id) {
         return em.unwrap(Session.class)
-                .createQuery("SELECT distinct b FROM Book b JOIN FETCH b.authors JOIN FETCH b.genres WHERE b.id=:id", Book.class)
+                .createQuery("SELECT distinct c FROM Comment c WHERE c.id=:id", Comment.class)
                 .setParameter("id", id)
                 .setFirstResult(0)
                 .setMaxResults(1)
@@ -45,13 +45,14 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public List<Book> findAll() {
-        TypedQuery<Book> query = em.createQuery("SELECT distinct b FROM Book b JOIN FETCH b.authors JOIN FETCH b.genres", Book.class);
+    public List<Comment> findByBook(Book book) {
+        TypedQuery<Comment> query = em.createQuery("SELECT distinct c FROM Comment c WHERE c.book=:book", Comment.class);
+        query.setParameter("book", book);
         return query.getResultList();
     }
 
     @Override
-    public void update(Book book) {
-        em.merge(book);
+    public void update(Comment comment) {
+        em.merge(comment);
     }
 }
